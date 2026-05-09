@@ -1,0 +1,564 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--g:#C9A84C;--gl:#F5E6B8;--gp:#FFFBF0;--gd:#7A5C10;
+--n:#1B2E4B;--nm:#2A4570;--nl:#E8EFF8;--np:#F4F7FC;
+--w:#FFFFFF;--off:#F9F8F6;--br:#E5E0D8;
+--tm:#4A5568;--mu:#8A96A8;--dk:#1A2030;
+}
+body{font-family:var(--font-sans)}
+
+.app{background:var(--off);max-width:680px;margin:0 auto}
+
+.topbar{background:var(--n);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-icon{width:36px;height:36px;background:var(--g);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.brand-icon i{font-size:18px;color:var(--n)}
+.brand-name{font-size:15px;font-weight:500;color:#fff;letter-spacing:-0.2px}
+.brand-sub{font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px}
+.topbar-right{display:flex;gap:6px}
+.view-btn{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:500;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);background:transparent;cursor:pointer;transition:all .2s}
+.view-btn.active{background:var(--g);border-color:var(--g);color:var(--n)}
+.view-btn:hover:not(.active){background:rgba(255,255,255,0.08);color:#fff}
+.accent{height:3px;background:linear-gradient(90deg,var(--g),#3A6BBF)}
+
+.screen{display:none}
+.screen.active{display:block}
+
+.vault-screen{padding:16px}
+
+.vault-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.stat-card{background:var(--w);border:1px solid var(--br);border-radius:10px;padding:12px;text-align:center}
+.stat-num{font-size:22px;font-weight:500;color:var(--n);line-height:1}
+.stat-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:0.6px;margin-top:4px}
+
+.section-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.section-title-text{font-size:13px;font-weight:500;color:var(--dk)}
+.add-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:500;background:var(--n);color:var(--g);border:none;cursor:pointer;transition:background .2s}
+.add-btn:hover{background:var(--nm)}
+.add-btn i{font-size:14px}
+
+.book-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.book-card{background:var(--w);border:1px solid var(--br);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.book-card:hover{border-color:var(--g)}
+.book-card.active-card{border:2px solid var(--g)}
+.book-spine{height:6px}
+.spine-sl{background:var(--g)}
+.spine-nf{background:#3A6BBF}
+.book-card-body{padding:12px}
+.book-card-title{font-size:13px;font-weight:500;color:var(--dk);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.book-card-author{font-size:11px;color:var(--mu);margin-bottom:8px}
+.book-card-bottom{display:flex;align-items:center;justify-content:space-between}
+.book-mode-tag{font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px}
+.tag-sl{background:var(--gp);color:var(--gd);border:1px solid var(--gl)}
+.tag-nf{background:var(--nl);color:#185FA5;border:1px solid #C5D5EA}
+.book-pct{font-size:11px;font-weight:500;color:var(--g)}
+.mini-bar{height:3px;background:var(--br);border-radius:2px;margin-top:6px;overflow:hidden}
+.mini-fill{height:100%;background:var(--g);border-radius:2px;transition:width .4s}
+
+.new-book-card{background:var(--w);border:2px dashed var(--br);border-radius:12px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s;min-height:110px}
+.new-book-card:hover{border-color:var(--g)}
+.new-book-card i{font-size:22px;color:var(--mu);margin-bottom:6px}
+.new-book-card span{font-size:12px;color:var(--mu)}
+
+.reading-screen{padding:16px}
+
+.back-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;cursor:pointer}
+.back-row i{font-size:16px;color:var(--mu)}
+.back-row span{font-size:12px;color:var(--mu)}
+.back-row:hover span,.back-row:hover i{color:var(--n)}
+
+.book-hero{background:var(--n);border-radius:14px;padding:16px;margin-bottom:14px;display:flex;gap:14px;align-items:flex-start}
+.cover-art{width:52px;height:68px;background:var(--g);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cover-art i{font-size:24px;color:var(--n)}
+.hero-info{flex:1;min-width:0}
+.hero-title{font-size:16px;font-weight:500;color:#fff;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero-author{font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:10px}
+.hero-tags{display:flex;gap:6px;flex-wrap:wrap}
+.hero-tag{font-size:10px;font-weight:500;padding:3px 8px;border-radius:10px}
+.htag-sl{background:rgba(201,168,76,0.2);color:var(--g);border:1px solid rgba(201,168,76,0.3)}
+.htag-nf{background:rgba(58,107,191,0.2);color:#7AABF0;border:1px solid rgba(58,107,191,0.3)}
+.htag-status{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1)}
+
+.wheel-section{background:var(--w);border:1px solid var(--br);border-radius:14px;padding:16px;margin-bottom:12px}
+.wheel-inner{display:flex;align-items:center;gap:16px}
+.wheel-wrap{position:relative;width:100px;height:100px;flex-shrink:0}
+.wheel-wrap canvas{position:absolute;top:0;left:0;width:100px;height:100px}
+.wheel-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.w-pct{font-size:20px;font-weight:500;color:var(--n);line-height:1}
+.w-lbl{font-size:10px;color:var(--mu);margin-top:2px;letter-spacing:0.3px}
+.wheel-info{flex:1}
+.wi-title{font-size:13px;font-weight:500;color:var(--dk);margin-bottom:4px}
+.wi-sub{font-size:12px;color:var(--mu);line-height:1.5;margin-bottom:10px}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.chip{padding:3px 8px;border-radius:20px;font-size:11px;border:1px solid var(--br);color:var(--mu);background:var(--off);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:3px}
+.chip i{font-size:11px}
+.chip.done{background:var(--gp);border-color:var(--gl);color:var(--gd)}
+.chip.done i{color:var(--g)}
+.mark-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:500;background:var(--n);color:var(--g);border:none;cursor:pointer;transition:background .2s}
+.mark-btn:hover{background:var(--nm)}
+.mark-btn i{font-size:14px}
+
+.mode-switcher{display:flex;gap:6px;margin-bottom:12px}
+.mode-sw-btn{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:500;border:1px solid var(--br);background:var(--w);color:var(--mu);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px}
+.mode-sw-btn i{font-size:14px}
+.mode-sw-btn.ms-sl{background:var(--gp);border-color:var(--gl);color:var(--gd)}
+.mode-sw-btn.ms-nf{background:var(--nl);border-color:#C5D5EA;color:#185FA5}
+
+.sections-list{display:flex;flex-direction:column;gap:8px}
+.sec-block{background:var(--w);border:1px solid var(--br);border-radius:12px;overflow:hidden}
+.sec-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;transition:background .15s}
+.sec-head:hover{background:var(--off)}
+.sec-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
+.sn-sh{background:var(--nl);color:#185FA5}
+.sn-sl{background:var(--gp);color:var(--gd)}
+.sn-nf{background:var(--nl);color:#185FA5}
+.sec-info{flex:1}
+.sec-ttl{font-size:13px;font-weight:500;color:var(--dk)}
+.sec-sub{font-size:11px;color:var(--mu);margin-top:1px}
+.sec-chev{font-size:15px;color:var(--mu);transition:transform .2s;margin-left:auto}
+.sec-block.open .sec-chev{transform:rotate(180deg)}
+.sec-done{font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;background:var(--gp);color:var(--gd);border:1px solid var(--gl);margin-left:4px}
+.sec-body{padding:12px 14px;border-top:1px solid var(--br);display:none}
+.sec-block.open .sec-body{display:block}
+
+.prompt-box{background:var(--np);border-left:3px solid var(--nm);border-radius:0 7px 7px 0;padding:9px 12px;margin-bottom:10px}
+.prompt-text{font-size:12px;color:var(--nm);font-style:italic;line-height:1.6}
+
+.callout-g{background:var(--gp);border:1px solid var(--gl);border-radius:8px;padding:9px 11px;margin-bottom:9px;display:flex;gap:7px}
+.callout-g i{color:var(--gd);font-size:14px;flex-shrink:0;margin-top:1px}
+.callout-g span{font-size:12px;color:var(--gd);line-height:1.55}
+
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px}
+.fbox{background:var(--off);border:1px solid var(--br);border-radius:7px;padding:8px 10px}
+.fbox.full{grid-column:1/-1}
+.fl{font-size:10px;text-transform:uppercase;letter-spacing:0.7px;color:var(--mu);margin-bottom:3px}
+.fv{font-size:12px;color:var(--tm);font-style:italic}
+
+.ta{background:var(--w);border:1px solid var(--br);border-radius:7px;padding:9px 11px;font-size:12px;color:var(--mu);font-style:italic;line-height:1.6;min-height:52px;margin-bottom:9px;width:100%}
+
+.quote-strip{border-left:3px solid var(--g);background:var(--gp);border-radius:0 7px 7px 0;padding:9px 12px;margin-bottom:7px;font-size:12px;color:var(--gd);font-style:italic;line-height:1.6}
+
+.stars{display:flex;gap:4px;margin-bottom:9px}
+.star-b{font-size:20px;cursor:pointer;color:var(--br);background:none;border:none;padding:0;line-height:1;transition:color .15s}
+.star-b.lit{color:var(--g)}
+
+.pill-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
+.pill{padding:4px 10px;border-radius:20px;font-size:11px;border:1px solid var(--br);color:var(--mu);background:var(--w);cursor:pointer;transition:all .15s}
+.pill.on{background:var(--nl);border-color:#C5D5EA;color:#185FA5}
+
+.chk-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;font-size:12px;color:var(--tm);line-height:1.5;cursor:pointer}
+.cb{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--br);background:var(--w);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.cb.on{background:var(--g);border-color:var(--g)}
+.cb.on::after{content:'';width:7px;height:4px;border-left:1.5px solid var(--n);border-bottom:1.5px solid var(--n);transform:rotate(-45deg) translateY(-1px);display:block}
+
+.yn-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tm)}
+.yn-row:last-child{border-bottom:none}
+.yn-set{display:flex;gap:4px}
+.yn{padding:3px 8px;border-radius:6px;font-size:11px;font-weight:500;border:1px solid var(--br);color:var(--mu);background:var(--w);cursor:pointer;transition:all .15s}
+.yn.y{background:var(--gp);border-color:var(--gl);color:var(--gd)}
+.yn.no{background:var(--nl);border-color:#C5D5EA;color:#185FA5}
+
+.tpill-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
+.tpill{padding:5px 12px;border-radius:20px;font-size:12px;border:1px solid var(--br);color:var(--mu);background:var(--w);cursor:pointer;transition:all .15s}
+.tpill.on{background:var(--n);border-color:var(--n);color:var(--g)}
+
+.mode-divider{display:flex;align-items:center;gap:8px;margin:4px 0 8px}
+.mode-divider::before,.mode-divider::after{content:'';flex:1;height:1px}
+.md-sl::before,.md-sl::after{background:var(--gl)}
+.md-nf::before,.md-nf::after{background:#C5D5EA}
+.md-label{font-size:11px;font-weight:500;padding:2px 9px;border-radius:20px}
+.md-sl .md-label{background:var(--gp);color:var(--gd);border:1px solid var(--gl)}
+.md-nf .md-label{background:var(--nl);color:#185FA5;border:1px solid #C5D5EA}
+
+.remind-box{background:var(--off);border:1px solid var(--br);border-radius:8px;padding:9px 11px;display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.remind-date{margin-left:auto;background:var(--gp);border:1px solid var(--gl);color:var(--gd);font-size:11px;font-weight:500;padding:2px 8px;border-radius:6px}
+
+.audit-wrap{border:1px solid var(--br);border-radius:8px;overflow:hidden;margin-bottom:9px}
+
+.footer{background:var(--n);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.fl-txt{font-size:11px;color:rgba(255,255,255,0.35);font-style:italic}
+.fr-icons{display:flex;gap:8px}
+.fr-icons i{font-size:16px;color:var(--g);opacity:0.6}
+
+.new-book-modal{background:var(--w);border:1px solid var(--br);border-radius:14px;padding:20px;margin-bottom:14px}
+.modal-title{font-size:15px;font-weight:500;color:var(--dk);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.modal-title i{font-size:18px;color:var(--g)}
+.input-group{margin-bottom:10px}
+.input-label{font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--mu);margin-bottom:5px}
+.text-input{width:100%;padding:8px 11px;border:1px solid var(--br);border-radius:8px;font-size:13px;color:var(--dk);background:var(--w);outline:none;font-family:var(--font-sans)}
+.text-input:focus{border-color:var(--g)}
+.mode-pick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.mp-btn{padding:10px;border-radius:8px;border:1px solid var(--br);background:var(--w);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:var(--mu)}
+.mp-btn i{font-size:16px}
+.mp-btn.sel-sl{background:var(--gp);border-color:var(--g);color:var(--gd)}
+.mp-btn.sel-nf{background:var(--nl);border-color:#3A6BBF;color:#185FA5}
+.create-btn{width:100%;padding:10px;border-radius:8px;background:var(--n);color:var(--g);font-size:13px;font-weight:500;border:none;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.create-btn:hover{background:var(--nm)}
+.create-btn i{font-size:15px}
+.hidden{display:none}
+</style>
+
+<h2 class="sr-only">Reading Vault — a multi-book reading tracker with progress wheels, book library, and full Proof of Reading analysis per book</h2>
+
+<div class="app">
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-icon"><i class="ti ti-books" aria-hidden="true"></i></div>
+    <div>
+      <div class="brand-name">Reading Vault</div>
+      <div class="brand-sub">Proof of Reading — your library</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="view-btn active" onclick="showScreen('vault')" id="vbtn">Library</button>
+    <button class="view-btn" onclick="showScreen('reading')" id="rbtn">Current book</button>
+  </div>
+</div>
+<div class="accent"></div>
+
+<div id="screen-vault" class="screen active vault-screen">
+
+  <div class="vault-stats">
+    <div class="stat-card"><div class="stat-num" id="s-total">2</div><div class="stat-lbl">Books read</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-sl">1</div><div class="stat-lbl">Self-help</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-nf">1</div><div class="stat-lbl">Fiction</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-avg">★4.5</div><div class="stat-lbl">Avg rating</div></div>
+  </div>
+
+  <div class="section-row">
+    <div class="section-title-text">Your books</div>
+    <button class="add-btn" onclick="showAddForm()"><i class="ti ti-plus" aria-hidden="true"></i> Add book</button>
+  </div>
+
+  <div id="add-form" class="new-book-modal hidden">
+    <div class="modal-title"><i class="ti ti-book-2" aria-hidden="true"></i> New book</div>
+    <div class="input-group">
+      <div class="input-label">Title</div>
+      <input class="text-input" id="new-title" placeholder="Book title…" />
+    </div>
+    <div class="input-group">
+      <div class="input-label">Author</div>
+      <input class="text-input" id="new-author" placeholder="Author name…" />
+    </div>
+    <div class="input-label" style="margin-bottom:6px">Mode</div>
+    <div class="mode-pick">
+      <button class="mp-btn sel-sl" onclick="pickNewMode('sl',this)" id="np-sl"><i class="ti ti-bulb" aria-hidden="true"></i> Self-help / Learning</button>
+      <button class="mp-btn" onclick="pickNewMode('nf',this)" id="np-nf"><i class="ti ti-wand" aria-hidden="true"></i> Fiction</button>
+    </div>
+    <button class="create-btn" onclick="createBook()"><i class="ti ti-circle-check" aria-hidden="true"></i> Add to vault</button>
+  </div>
+
+  <div class="book-grid" id="book-grid"></div>
+
+</div>
+
+<div id="screen-reading" class="screen reading-screen">
+
+  <div class="back-row" onclick="showScreen('vault')">
+    <i class="ti ti-arrow-left" aria-hidden="true"></i>
+    <span>Back to library</span>
+  </div>
+
+  <div class="book-hero" id="book-hero">
+    <div class="cover-art"><i class="ti ti-book" aria-hidden="true"></i></div>
+    <div class="hero-info">
+      <div class="hero-title" id="hero-title">Book Title</div>
+      <div class="hero-author" id="hero-author">Author Name</div>
+      <div class="hero-tags">
+        <span class="hero-tag htag-sl" id="hero-mode-tag">Self-help</span>
+        <span class="hero-tag htag-status">In progress</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wheel-section">
+    <div class="wheel-inner">
+      <div class="wheel-wrap">
+        <canvas id="wcanvas" width="100" height="100" role="img" aria-label="Section completion wheel"></canvas>
+        <div class="wheel-center">
+          <div class="w-pct" id="wpct">0%</div>
+          <div class="w-lbl">done</div>
+        </div>
+      </div>
+      <div class="wheel-info">
+        <div class="wi-title">Your progress</div>
+        <div class="wi-sub">Mark sections as you fill them in. Each one brings the wheel closer to gold.</div>
+        <div class="chips-wrap" id="chips"></div>
+        <button class="mark-btn" onclick="markNextSection()">
+          <i class="ti ti-circle-check" aria-hidden="true"></i> Mark next done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mode-switcher">
+    <button class="mode-sw-btn ms-sl" id="ms-sl" onclick="switchMode('sl')"><i class="ti ti-bulb" aria-hidden="true"></i> Self-help mode</button>
+    <button class="mode-sw-btn" id="ms-nf" onclick="switchMode('nf')"><i class="ti ti-wand" aria-hidden="true"></i> Fiction mode</button>
+  </div>
+
+  <div class="sections-list" id="sections-list"></div>
+
+</div>
+
+<div class="footer">
+  <div class="fl-txt">A book finished is a world remembered.</div>
+  <div class="fr-icons">
+    <i class="ti ti-book-2" aria-hidden="true"></i>
+    <i class="ti ti-candle" aria-hidden="true"></i>
+    <i class="ti ti-feather" aria-hidden="true"></i>
+  </div>
+</div>
+
+</div>
+
+<script>
+const SHARED_SECS = [
+  {id:'s2',label:'Summary',title:'The honest summary',sub:'What was it actually about?'},
+  {id:'s3',label:'Quotes',title:'Quotes worth keeping',sub:'Lines that made you stop'},
+  {id:'s4',label:'Verdict',title:'Verdict',sub:'Your honest rating'},
+  {id:'s5',label:'Revisit',title:'Revisit reminder',sub:'What deserves a second look?'},
+];
+const SL_SECS = [
+  {id:'sl6',label:'Framework',title:'The core framework',sub:'The real steps, not the vibe'},
+  {id:'sl7',label:'One idea',title:'The one idea',sub:'300 pages, one sentence'},
+  {id:'sl8',label:'The case',title:'The author\'s case',sub:'Did they actually prove it?'},
+  {id:'sl9',label:'The ask',title:'What this book asked of me',sub:'The actual ask'},
+  {id:'sl10',label:'Commit',title:'The application commitment',sub:'Specific, not vague'},
+  {id:'sl11',label:'Audit',title:'Honest audit',sub:'Gentle accountability'},
+];
+const NF_SECS = [
+  {id:'nf6',label:'World',title:'The world & the wound',sub:'What was broken at the center?'},
+  {id:'nf7',label:'Character',title:'The character that stayed',sub:'Still with you after the last page'},
+  {id:'nf8',label:'Moment',title:'The moment',sub:'What the whole book built toward'},
+  {id:'nf9',label:'Subtext',title:'What it was really about',sub:'Forget the plot'},
+  {id:'nf10',label:'Residue',title:'What it left in you',sub:'Even something small'},
+  {id:'nf11',label:'Live in it',title:'Would you live in it',sub:'The question that reveals everything'},
+];
+
+let books = [
+  {id:1,title:"Man's Search for Meaning",author:'Viktor E. Frankl',mode:'sl',done:new Set(['s2','s3','s4','s5','sl6','sl7','sl8','sl9','sl10','sl11']),stars:5},
+  {id:2,title:'The Midnight Library',author:'Matt Haig',mode:'nf',done:new Set(['s2','s3','s4']),stars:4},
+];
+let activeBook = books[0];
+let activeMode = 'sl';
+let newMode = 'sl';
+let openSecs = new Set();
+
+function getActiveSecs(mode){
+  return [...SHARED_SECS,...(mode==='sl'?SL_SECS:NF_SECS)];
+}
+
+function bookProgress(book){
+  const secs = getActiveSecs(book.mode);
+  return secs.length ? Math.round((book.done.size/secs.length)*100) : 0;
+}
+
+function renderBookGrid(){
+  const grid = document.getElementById('book-grid');
+  let html = '';
+  books.forEach(b=>{
+    const pct = bookProgress(b);
+    html += `<div class="book-card${activeBook&&activeBook.id===b.id?' active-card':''}" onclick="openBook(${b.id})">
+      <div class="book-spine ${b.mode==='sl'?'spine-sl':'spine-nf'}"></div>
+      <div class="book-card-body">
+        <div class="book-card-title">${b.title}</div>
+        <div class="book-card-author">${b.author}</div>
+        <div class="book-card-bottom">
+          <span class="book-mode-tag ${b.mode==='sl'?'tag-sl':'tag-nf'}">${b.mode==='sl'?'Self-help':'Fiction'}</span>
+          <span class="book-pct">${pct}%</span>
+        </div>
+        <div class="mini-bar"><div class="mini-fill" style="width:${pct}%"></div></div>
+      </div>
+    </div>`;
+  });
+  html += `<div class="new-book-card" onclick="showAddForm()">
+    <i class="ti ti-plus" aria-hidden="true"></i>
+    <span>Add new book</span>
+  </div>`;
+  grid.innerHTML = html;
+  updateStats();
+}
+
+function updateStats(){
+  document.getElementById('s-total').textContent = books.length;
+  document.getElementById('s-sl').textContent = books.filter(b=>b.mode==='sl').length;
+  document.getElementById('s-nf').textContent = books.filter(b=>b.mode==='nf').length;
+  const avg = books.length ? (books.reduce((a,b)=>a+b.stars,0)/books.length).toFixed(1) : '—';
+  document.getElementById('s-avg').textContent = '★'+avg;
+}
+
+function openBook(id){
+  activeBook = books.find(b=>b.id===id);
+  activeMode = activeBook.mode;
+  showScreen('reading');
+  renderBookPage();
+}
+
+function renderBookPage(){
+  document.getElementById('hero-title').textContent = activeBook.title;
+  document.getElementById('hero-author').textContent = activeBook.author;
+  const modeTag = document.getElementById('hero-mode-tag');
+  modeTag.textContent = activeBook.mode==='sl'?'Self-help':'Fiction';
+  modeTag.className = 'hero-tag '+(activeBook.mode==='sl'?'htag-sl':'htag-nf');
+  document.getElementById('ms-sl').className = 'mode-sw-btn'+(activeMode==='sl'?' ms-sl':'');
+  document.getElementById('ms-nf').className = 'mode-sw-btn'+(activeMode==='nf'?' ms-nf':'');
+  drawWheel();
+  renderChips();
+  renderSections();
+}
+
+function drawWheel(){
+  const canvas = document.getElementById('wcanvas');
+  const ctx = canvas.getContext('2d');
+  const secs = getActiveSecs(activeMode);
+  const done = secs.filter(s=>activeBook.done.has(s.id)).length;
+  const pct = secs.length ? done/secs.length : 0;
+  ctx.clearRect(0,0,100,100);
+  ctx.beginPath();ctx.arc(50,50,42,0,Math.PI*2);
+  ctx.strokeStyle='#E8EFF8';ctx.lineWidth=8;ctx.stroke();
+  if(pct>0){
+    ctx.beginPath();ctx.arc(50,50,42,-Math.PI/2,-Math.PI/2+Math.PI*2*pct);
+    ctx.strokeStyle='#C9A84C';ctx.lineWidth=8;ctx.lineCap='round';ctx.stroke();
+  }
+  document.getElementById('wpct').textContent=Math.round(pct*100)+'%';
+}
+
+function renderChips(){
+  const secs = getActiveSecs(activeMode);
+  document.getElementById('chips').innerHTML = secs.map(s=>`
+    <div class="chip${activeBook.done.has(s.id)?' done':''}" onclick="toggleDone('${s.id}')">
+      <i class="ti ti-${activeBook.done.has(s.id)?'check':'circle'}" aria-hidden="true"></i>${s.label}
+    </div>`).join('');
+}
+
+function toggleDone(id){
+  if(activeBook.done.has(id)) activeBook.done.delete(id);
+  else activeBook.done.add(id);
+  drawWheel();renderChips();renderBookGrid();
+}
+
+function markNextSection(){
+  const secs = getActiveSecs(activeMode);
+  const next = secs.find(s=>!activeBook.done.has(s.id));
+  if(next){activeBook.done.add(next.id);drawWheel();renderChips();renderBookGrid();}
+}
+
+function switchMode(m){
+  activeMode = m;
+  document.getElementById('ms-sl').className='mode-sw-btn'+(m==='sl'?' ms-sl':'');
+  document.getElementById('ms-nf').className='mode-sw-btn'+(m==='nf'?' ms-nf':'');
+  drawWheel();renderChips();renderSections();
+}
+
+function renderSections(){
+  const list = document.getElementById('sections-list');
+  const secs = getActiveSecs(activeMode);
+  let html = '';
+  secs.forEach((s,i)=>{
+    const isShared = i<4;
+    const isDone = activeBook.done.has(s.id);
+    const isOpen = openSecs.has(s.id);
+    html += `<div class="sec-block${isOpen?' open':''}" id="blk-${s.id}">
+      <div class="sec-head" onclick="toggleSec('${s.id}')">
+        <div class="sec-num ${isShared?'sn-sh':activeMode==='sl'?'sn-sl':'sn-nf'}">${i+1}</div>
+        <div class="sec-info">
+          <div class="sec-ttl">${s.title}</div>
+          <div class="sec-sub">${s.sub}</div>
+        </div>
+        ${isDone?'<span class="sec-done">Done</span>':''}
+        <i class="ti ti-chevron-down sec-chev" aria-hidden="true"></i>
+      </div>
+      <div class="sec-body">${getSectionBody(s.id)}</div>
+    </div>`;
+  });
+
+  if(activeMode==='sl'){
+    html = html.replace('</div><div class="sec-block" id="blk-sl6">',
+      `</div><div class="mode-divider md-sl"><span class="md-label"><i class="ti ti-bulb" style="font-size:11px;margin-right:3px"></i>Self-help mode</span></div><div class="sec-block" id="blk-sl6">`);
+  } else {
+    html = html.replace('</div><div class="sec-block" id="blk-nf6">',
+      `</div><div class="mode-divider md-nf"><span class="md-label"><i class="ti ti-wand" style="font-size:11px;margin-right:3px"></i>Fiction mode</span></div><div class="sec-block" id="blk-nf6">`);
+  }
+  list.innerHTML = html;
+}
+
+function getSectionBody(id){
+  const bodies = {
+    s2:`<div class="prompt-box"><div class="prompt-text">"Explain this book to a friend who will never read it — in your own words. No quotes, no plot summary. Just what you actually understood."</div></div><div class="ta">Write 3–5 sentences. If you're struggling, that IS the point…</div>`,
+    s3:`<div class="quote-strip">"The line that made you pause — add it here with a page number…"</div><div class="quote-strip">"Another keeper…"</div><div class="callout-g"><i class="ti ti-info-circle" aria-hidden="true"></i><span>Only include lines you'd actually return to. Fewer, better.</span></div>`,
+    s4:`<div style="font-size:11px;color:var(--mu);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.6px">Your rating</div><div class="stars" id="stars-${id}"><button class="star-b lit" onclick="rateStar(1)">★</button><button class="star-b lit" onclick="rateStar(2)">★</button><button class="star-b lit" onclick="rateStar(3)">★</button><button class="star-b lit" onclick="rateStar(4)">★</button><button class="star-b" onclick="rateStar(5)">★</button></div><div class="ta">"I would recommend this to someone who…"</div>`,
+    s5:`<div class="remind-box"><div class="cb" onclick="this.classList.toggle('on')" role="checkbox" aria-label="Set revisit reminder"></div><div style="font-size:12px;color:var(--tm)">Set a reminder to return to this in 3 months</div><div class="remind-date"><i class="ti ti-calendar" style="font-size:11px"></i> +3 months</div></div><div class="ta">What specifically to return to — an idea, a question, a framework to check…</div>`,
+    sl6:`<div class="prompt-box"><div class="prompt-text">"What is the author's actual system or method — not the vibe, the real steps? Write it in order. If you can't, you didn't absorb it yet."</div></div><div class="callout-g"><i class="ti ti-alert-triangle" aria-hidden="true"></i><span>Your words only. No lifting from the table of contents.</span></div>${['Step 1','Step 2','Step 3','Step 4'].map(s=>`<div class="chk-row" onclick="this.querySelector('.cb').classList.toggle('on')"><div class="cb"></div><span>${s}: …</span></div>`).join('')}`,
+    sl7:`<div class="prompt-box"><div class="prompt-text">"If this entire book reduced to one sentence, what would it be? Most self-help books have one idea stretched thin. Find it."</div></div><div class="ta">The book's actual thesis in your own words — not the subtitle, not the tagline…</div>`,
+    sl8:`<div class="prompt-box"><div class="prompt-text">"What evidence did the author use to prove their point — and did they actually prove it?"</div></div><div class="ta">Evidence and examples they used…</div><div style="font-size:11px;color:var(--mu);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.6px">Did they prove it?</div><div class="tpill-row"><button class="tpill on" onclick="pickTpill(this,'.tpill-row')">Yes, convincingly</button><button class="tpill" onclick="pickTpill(this,'.tpill-row')">Partly</button><button class="tpill" onclick="pickTpill(this,'.tpill-row')">Not really</button></div>`,
+    sl9:`<div class="prompt-box"><div class="prompt-text">"What did the author actually want you to change, do, or believe by the end?"</div></div><div class="ta">Be honest — not what sounded good to write, the actual ask…</div>`,
+    sl10:`<div class="callout-g"><i class="ti ti-flame" aria-hidden="true"></i><span>Not "be more present." Something with a real action, a real time, a real place.</span></div><div class="fgrid"><div class="fbox full"><div class="fl">I will…</div><div class="fv">The specific action…</div></div><div class="fbox"><div class="fl">When…</div><div class="fv">Trigger or time…</div></div><div class="fbox"><div class="fl">So that…</div><div class="fv">The outcome I actually want…</div></div></div>`,
+    sl11:`<div class="audit-wrap">${[['Did I finish feeling motivated but retain nothing?','n','y'],['Can I explain the framework to someone else right now?','y','n'],['Was this book one idea repeated, or genuinely layered?','one','layered']].map(([q,a,b])=>`<div class="yn-row"><span>${q}</span><div class="yn-set"><button class="yn${a==='y'||a==='one'?' y':a==='n'?'':''}" onclick="pickYN(this)">${a==='y'?'Yes':a==='n'?'No':'One idea'}</button><button class="yn${b==='y'||b==='layered'?' y':''}" onclick="pickYN(this)">${b==='n'?'No':b==='y'?'Yes':'Layered'}</button></div></div>`).join('')}</div>`,
+    nf6:`<div class="prompt-box"><div class="prompt-text">"What world did this book live in, and what was broken or at stake in it?"</div></div><div class="fgrid"><div class="fbox full"><div class="fl">The world</div><div class="fv">Setting, era, atmosphere…</div></div><div class="fbox full"><div class="fl">What was broken or at stake</div><div class="fv">The wound at the center of this story…</div></div></div>`,
+    nf7:`<div class="prompt-box"><div class="prompt-text">"Which character are you still thinking about — what did they want, and did they get it?"</div></div><div class="fgrid"><div class="fbox"><div class="fl">Character</div><div class="fv">Name…</div></div><div class="fbox"><div class="fl">Their real want</div><div class="fv">Not their stated goal…</div></div><div class="fbox full"><div class="fl">Did they get it — and why do they linger?</div><div class="fv">…</div></div></div>`,
+    nf8:`<div class="prompt-box"><div class="prompt-text">"What was the scene or line the whole book was quietly building toward?"</div></div><div class="quote-strip">"The moment, in your own words — or the exact line if you must."</div><div class="ta">Why it landed the way it did…</div>`,
+    nf9:`<div class="prompt-box"><div class="prompt-text">"Forget the plot — what was this book actually exploring underneath?"</div></div><div class="pill-row">${['Love','Power','Grief','Identity','Belonging','Time','Survival','Memory','Other…'].map((t,i)=>`<button class="pill${i===1?' on':''}" onclick="this.classList.toggle('on')">${t}</button>`).join('')}</div><div class="ta">What it was quietly saying about being human…</div>`,
+    nf10:`<div class="callout-g"><i class="ti ti-sparkles" aria-hidden="true"></i><span>It doesn't have to be profound. Sometimes a book just makes you notice the light differently. That counts.</span></div><div class="ta">What shifted — even slightly — after the last page…</div>`,
+    nf11:`<div class="prompt-box"><div class="prompt-text">"Would you want to exist in this book's world? Why or why not?"</div></div><div class="tpill-row"><button class="tpill" onclick="pickTpill(this,'.tpill-row')">Yes, absolutely</button><button class="tpill on" onclick="pickTpill(this,'.tpill-row')">No — beautiful but terrifying</button><button class="tpill" onclick="pickTpill(this,'.tpill-row')">Depends who I'd be</button></div><div class="ta">The honest answer — and what it reveals about how you read this…</div>`,
+  };
+  return bodies[id]||'<div class="ta">Write your thoughts here…</div>';
+}
+
+function toggleSec(id){
+  if(openSecs.has(id)) openSecs.delete(id);
+  else openSecs.add(id);
+  document.getElementById('blk-'+id).classList.toggle('open',openSecs.has(id));
+}
+
+function rateStar(n){
+  activeBook.stars = n;
+  document.querySelectorAll('.star-b').forEach((b,i)=>b.classList.toggle('lit',i<n));
+}
+
+function pickTpill(btn,sel){
+  btn.closest(sel).querySelectorAll('.tpill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function pickYN(btn){
+  const row = btn.closest('.yn-set');
+  row.querySelectorAll('.yn').forEach(b=>{b.classList.remove('y');b.classList.remove('no');});
+  btn.classList.add('y');
+}
+
+function showScreen(s){
+  document.getElementById('screen-vault').classList.toggle('active',s==='vault');
+  document.getElementById('screen-reading').classList.toggle('active',s==='reading');
+  document.getElementById('vbtn').classList.toggle('active',s==='vault');
+  document.getElementById('rbtn').classList.toggle('active',s==='reading');
+  if(s==='vault') renderBookGrid();
+}
+
+function showAddForm(){
+  const f = document.getElementById('add-form');
+  f.classList.toggle('hidden');
+  if(!f.classList.contains('hidden')) document.getElementById('new-title').focus();
+}
+
+function pickNewMode(m,btn){
+  newMode = m;
+  document.getElementById('np-sl').className='mp-btn'+(m==='sl'?' sel-sl':'');
+  document.getElementById('np-nf').className='mp-btn'+(m==='nf'?' sel-nf':'');
+}
+
+function createBook(){
+  const title = document.getElementById('new-title').value.trim();
+  const author = document.getElementById('new-author').value.trim();
+  if(!title) return;
+  books.push({id:Date.now(),title,author:author||'Unknown author',mode:newMode,done:new Set(),stars:0});
+  document.getElementById('new-title').value='';
+  document.getElementById('new-author').value='';
+  document.getElementById('add-form').classList.add('hidden');
+  renderBookGrid();
+}
+
+renderBookGrid();
+</script>
